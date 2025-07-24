@@ -8,7 +8,7 @@ const {
   deleteBook,
 } = require('../controllers/bookController');
 
-const protect = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware'); // ✅ Fixed
 
 // @route   POST /api/books
 // @desc    Add a new book
