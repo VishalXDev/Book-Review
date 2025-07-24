@@ -77,14 +77,14 @@ exports.getBookById = async (req, res) => {
 // ❌ Delete a book (only creator can)
 exports.deleteBook = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findById(req.params.id).populate('createdBy');
     if (!book) return res.status(404).json({ message: 'Book not found' });
 
     // ✅ Debug logs to compare creator and logged-in user
-    console.log('🟡 Book Created By:', book.createdBy.toString());
+    console.log('🟡 Book Created By:', book.createdBy._id.toString());
     console.log('🔵 Logged-in User:', req.user._id.toString());
 
-    if (book.createdBy.toString() !== req.user._id.toString()) {
+    if (book.createdBy._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this book' });
     }
 

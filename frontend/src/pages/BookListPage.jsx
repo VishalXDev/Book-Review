@@ -63,56 +63,99 @@ const BookListPage = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">📚 Book List</h1>
+    <div className="min-h-screen bg-black text-white p-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-3xl font-light tracking-widest mb-2">LIBRARY</h1>
+          <div className="w-16 h-px bg-white"></div>
+        </div>
 
-      {/* Filters */}
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Filter by Genre"
-          value={genre}
-          onChange={(e) => setGenre(e.target.value)}
-          className="border px-2 py-1"
-        />
-        <input
-          type="text"
-          placeholder="Filter by Author"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          className="border px-2 py-1"
-        />
-      </div>
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <div className="space-y-2">
+            <label className="block text-xs uppercase tracking-widest text-gray-400">FILTER BY GENRE</label>
+            <input
+              type="text"
+              placeholder="Enter genre..."
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="w-full bg-transparent border border-gray-800 px-4 py-3 text-white placeholder-gray-600 focus:border-white focus:outline-none transition-colors duration-200"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-xs uppercase tracking-widest text-gray-400">FILTER BY AUTHOR</label>
+            <input
+              type="text"
+              placeholder="Enter author..."
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              className="w-full bg-transparent border border-gray-800 px-4 py-3 text-white placeholder-gray-600 focus:border-white focus:outline-none transition-colors duration-200"
+            />
+          </div>
+        </div>
 
-      {/* Loading / Error */}
-      {loading && <p>Loading books...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+        {/* Loading / Error States */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="inline-block w-6 h-6 border border-gray-600 border-t-white rounded-full animate-spin"></div>
+            <p className="mt-4 text-gray-400 text-sm tracking-wide">LOADING LIBRARY...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="text-center py-12">
+            <p className="text-red-400 text-sm tracking-wide uppercase">{error}</p>
+          </div>
+        )}
 
-      {/* Book Cards */}
-      {!loading && books.length === 0 && <p>No books found.</p>}
-      {books.map((book) => (
-        <BookCard key={book._id} book={book} onDelete={handleDeleteBook} currentUserId={user?._id} />
-      ))}
+        {/* No Books Found */}
+        {!loading && books.length === 0 && !error && (
+          <div className="text-center py-20">
+            <div className="w-16 h-16 border border-gray-800 rounded-sm mx-auto mb-6 flex items-center justify-center text-gray-600">
+              <span className="text-2xl">□</span>
+            </div>
+            <p className="text-gray-400 text-sm tracking-wide uppercase">NO BOOKS FOUND</p>
+          </div>
+        )}
 
-      {/* Pagination */}
-      <div className="mt-6 flex justify-center gap-4">
-        <button
-          className="px-4 py-1 border rounded"
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-        >
-          ⬅ Prev
-        </button>
-        <span className="px-4 py-1">
-          {page} / {totalPages}
-        </span>
-        <button
-          className="px-4 py-1 border rounded"
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages}
-        >
-          Next ➡
-        </button>
+        {/* Book Grid */}
+        <div className="space-y-6">
+          {books.map((book) => (
+            <BookCard key={book._id} book={book} onDelete={handleDeleteBook} currentUserId={user?._id} />
+          ))}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-16 flex justify-center items-center space-x-8">
+            <button
+              className="px-6 py-3 border border-gray-800 text-sm tracking-wide hover:border-white hover:text-white transition-colors duration-200 disabled:opacity-30 disabled:hover:border-gray-800 disabled:hover:text-gray-400"
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+            >
+              PREV
+            </button>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-400 tracking-widest">
+                {String(page).padStart(2, '0')}
+              </span>
+              <div className="w-8 h-px bg-gray-800"></div>
+              <span className="text-sm text-gray-600 tracking-widest">
+                {String(totalPages).padStart(2, '0')}
+              </span>
+            </div>
+
+            <button
+              className="px-6 py-3 border border-gray-800 text-sm tracking-wide hover:border-white hover:text-white transition-colors duration-200 disabled:opacity-30 disabled:hover:border-gray-800 disabled:hover:text-gray-400"
+              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={page === totalPages}
+            >
+              NEXT
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -150,25 +193,63 @@ const BookCard = ({ book, onDelete, currentUserId }) => {
   }
 
   return (
-    <div className="relative block mb-4 p-4 border rounded shadow hover:bg-gray-50">
+    <div className="relative group">
       <Link to={`/books/${book._id}`}>
-        <h2 className="text-xl font-semibold">{book.title}</h2>
-        <p>Author: {book.author}</p>
-        <p>Genre: {book.genre}</p>
-        <p>⭐ Average Rating: {avgRating !== null ? avgRating.toFixed(1) : 'N/A'}</p>
-      </Link>
+        <div className="border border-gray-900 p-6 hover:border-gray-700 transition-all duration-300 hover:bg-gray-950">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <h2 className="text-xl font-light tracking-wide mb-3 group-hover:text-gray-300 transition-colors duration-200">
+                {book.title}
+              </h2>
+              
+              <div className="space-y-2">
+                <div className="flex items-center space-x-4">
+                  <span className="text-xs uppercase tracking-widest text-gray-500 w-16">AUTHOR</span>
+                  <span className="text-sm text-gray-300">{book.author}</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className="text-xs uppercase tracking-widest text-gray-500 w-16">GENRE</span>
+                  <span className="text-sm text-gray-300">{book.genre}</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className="text-xs uppercase tracking-widest text-gray-500 w-16">RATING</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <div
+                          key={star}
+                          className={`w-2 h-2 border ${
+                            avgRating && star <= Math.round(avgRating)
+                              ? 'bg-white border-white'
+                              : 'border-gray-600'
+                          }`}
+                        ></div>
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-400 ml-2">
+                      {avgRating !== null ? avgRating.toFixed(1) : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      {/* 🔒 Show delete only if current user is creator */}
-      {book.user === currentUserId && (
-        <button
-          onClick={handleDeleteClick}
-          disabled={deleting}
-          className="absolute top-2 right-2 text-red-600 hover:text-red-800 text-sm"
-          title="Delete book"
-        >
-          {deleting ? 'Deleting...' : '🗑️'}
-        </button>
-      )}
+            {/* Delete Button */}
+            {book.user === currentUserId && (
+              <button
+                onClick={handleDeleteClick}
+                disabled={deleting}
+                className="ml-6 w-8 h-8 border border-gray-800 hover:border-red-800 hover:text-red-400 transition-colors duration-200 flex items-center justify-center text-xs disabled:opacity-50"
+                title="Delete book"
+              >
+                {deleting ? '·' : '×'}
+              </button>
+            )}
+          </div>
+          
+          <div className="w-full h-px bg-gray-900 group-hover:bg-gray-700 transition-colors duration-200"></div>
+        </div>
+      </Link>
     </div>
   )
 }

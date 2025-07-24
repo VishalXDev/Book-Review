@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const LoginPage = () => {
-  const [form, setForm] = useState({ username: '', password: '' }) // 🔁 CHANGED from email to username
+  const [form, setForm] = useState({ username: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -31,38 +31,86 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
-      {error && <p className="text-red-600 mb-3">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username" // 🔁 CHANGED from email to username
-          placeholder="Username or Email"
-          value={form.username}
-          onChange={handleChange}
-          required
-          className="w-full mb-3 border p-2"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="w-full mb-3 border p-2"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-2 rounded text-white ${
-            loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-8">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-2xl font-light tracking-widest mb-3">ACCESS</h2>
+          <div className="w-12 h-px bg-white mx-auto"></div>
+        </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="mb-8 p-4 border border-red-900 bg-red-950 bg-opacity-20">
+            <p className="text-red-400 text-sm tracking-wide text-center uppercase">
+              {error}
+            </p>
+          </div>
+        )}
+
+        {/* Login Form */}
+        <div onSubmit={handleSubmit} className="space-y-8">
+          {/* Username Field */}
+          <div className="space-y-3">
+            <label className="block text-xs uppercase tracking-widest text-gray-400">
+              IDENTITY
+            </label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username or email..."
+              value={form.username}
+              onChange={handleChange}
+              required
+              className="w-full bg-transparent border border-gray-800 px-4 py-4 text-white placeholder-gray-600 focus:border-white focus:outline-none transition-colors duration-200 tracking-wide"
+            />
+          </div>
+
+          {/* Password Field */}
+          <div className="space-y-3">
+            <label className="block text-xs uppercase tracking-widest text-gray-400">
+              CREDENTIAL
+            </label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password..."
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full bg-transparent border border-gray-800 px-4 py-4 text-white placeholder-gray-600 focus:border-white focus:outline-none transition-colors duration-200 tracking-wide"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-6">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={loading}
+              className={`w-full py-4 border transition-all duration-200 text-sm uppercase tracking-widest ${
+                loading
+                  ? 'border-gray-800 text-gray-600 cursor-not-allowed'
+                  : 'border-white bg-white text-black hover:bg-transparent hover:text-white'
+              }`}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center space-x-3">
+                  <div className="w-4 h-4 border border-gray-600 border-t-gray-400 rounded-full animate-spin"></div>
+                  <span>AUTHENTICATING</span>
+                </div>
+              ) : (
+                'ENTER'
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Footer Accent */}
+        <div className="mt-12 text-center">
+          <div className="w-24 h-px bg-gray-800 mx-auto"></div>
+        </div>
+      </div>
     </div>
   )
 }
