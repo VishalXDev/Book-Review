@@ -1,9 +1,31 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { token, logout, username } = useAuth();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format time for India timezone
+  const formatIndiaTime = (date) => {
+    return date.toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   const handleLogout = () => {
     logout();
@@ -14,13 +36,24 @@ const Navbar = () => {
   return (
     <nav className="bg-black border-b border-gray-900 text-white px-8 py-4 flex justify-between items-center backdrop-blur-sm">
       <Link 
-        to="/" 
+        to="/"
         className="text-xl font-light tracking-wider hover:text-gray-300 transition-colors duration-200 flex items-center space-x-2"
       >
         <div className="w-6 h-6 border border-white rounded-sm flex items-center justify-center text-xs">B</div>
         <span>REVIEWS</span>
       </Link>
       
+      {/* Online Status and Live Time */}
+      <div className="flex items-center space-x-4 text-xs">
+        <div className="flex items-center space-x-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-green-400 uppercase tracking-wider">ONLINE</span>
+        </div>
+        <div className="text-gray-400 font-mono tracking-wider">
+          IST {formatIndiaTime(currentTime)}
+        </div>
+      </div>
+             
       <div className="flex items-center space-x-8">
         {token ? (
           <>
@@ -28,13 +61,13 @@ const Navbar = () => {
               {username}
             </div>
             <Link 
-              to="/add-book" 
+              to="/add-book"
               className="text-sm font-light tracking-wide hover:text-gray-300 transition-colors duration-200 border border-gray-800 px-4 py-2 hover:border-gray-600"
             >
               ADD
             </Link>
             <button 
-              onClick={handleLogout} 
+              onClick={handleLogout}
               className="text-sm font-light tracking-wide hover:text-gray-300 transition-colors duration-200 border border-gray-800 px-4 py-2 hover:border-red-900 hover:text-red-400"
             >
               EXIT
@@ -43,13 +76,13 @@ const Navbar = () => {
         ) : (
           <>
             <Link 
-              to="/login" 
+              to="/login"
               className="text-sm font-light tracking-wide hover:text-gray-300 transition-colors duration-200 border border-gray-800 px-4 py-2 hover:border-gray-600"
             >
               LOGIN
             </Link>
             <Link 
-              to="/register" 
+              to="/register"
               className="text-sm font-light tracking-wide hover:text-gray-300 transition-colors duration-200 bg-white text-black px-4 py-2 hover:bg-gray-200"
             >
               REGISTER

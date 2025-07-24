@@ -16,6 +16,7 @@ const BookListPage = () => {
   const [books, setBooks] = useState([])
   const [genre, setGenre] = useState('')
   const [author, setAuthor] = useState('')
+  const [sortBy, setSortBy] = useState('') // 👉 Step 1: sorting state
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -32,7 +33,7 @@ const BookListPage = () => {
     setError('')
     try {
       const res = await axios.get(`${API_BASE}/api/books`, {
-        params: { genre: debouncedGenre, author: debouncedAuthor, page, limit: 5 },
+        params: { genre: debouncedGenre, author: debouncedAuthor, page, limit: 5, sortBy }, // 👉 Step 3: sortBy param
       })
       setBooks(res.data.books)
       setTotalPages(res.data.totalPages || 1)
@@ -46,9 +47,8 @@ const BookListPage = () => {
 
   useEffect(() => {
     fetchBooks()
-  }, [debouncedGenre, debouncedAuthor, page])
+  }, [debouncedGenre, debouncedAuthor, page, sortBy]) // 👉 Step 4: trigger fetch on sortBy change
 
-  // 👉 Delete handler: passed to BookCard
   const handleDeleteBook = async (bookId) => {
     try {
       await axios.delete(`${API_BASE}/api/books/${bookId}`, {
@@ -72,7 +72,7 @@ const BookListPage = () => {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="space-y-2">
             <label className="block text-xs uppercase tracking-widest text-gray-400">FILTER BY GENRE</label>
             <input
@@ -93,23 +93,34 @@ const BookListPage = () => {
               className="w-full bg-transparent border border-gray-800 px-4 py-3 text-white placeholder-gray-600 focus:border-white focus:outline-none transition-colors duration-200"
             />
           </div>
+          {/* 👉 Step 2: Sorting Dropdown */}
+          <div className="space-y-2">
+            <label className="block text-xs uppercase tracking-widest text-gray-400">SORT BY</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full bg-black text-white border border-gray-800 px-4 py-3 focus:border-white focus:outline-none transition-colors duration-200"
+            >
+              <option value="">Select...</option>
+              <option value="rating">Rating (High to Low)</option>
+              <option value="date">Date Added (Newest)</option>
+            </select>
+          </div>
+
         </div>
 
-        {/* Loading / Error States */}
+        {/* Loading, Error, No Books - unchanged */}
         {loading && (
           <div className="text-center py-12">
             <div className="inline-block w-6 h-6 border border-gray-600 border-t-white rounded-full animate-spin"></div>
             <p className="mt-4 text-gray-400 text-sm tracking-wide">LOADING LIBRARY...</p>
           </div>
         )}
-        
         {error && (
           <div className="text-center py-12">
             <p className="text-red-400 text-sm tracking-wide uppercase">{error}</p>
           </div>
         )}
-
-        {/* No Books Found */}
         {!loading && books.length === 0 && !error && (
           <div className="text-center py-20">
             <div className="w-16 h-16 border border-gray-800 rounded-sm mx-auto mb-6 flex items-center justify-center text-gray-600">
@@ -119,24 +130,23 @@ const BookListPage = () => {
           </div>
         )}
 
-        {/* Book Grid */}
+        {/* Book List */}
         <div className="space-y-6">
           {books.map((book) => (
             <BookCard key={book._id} book={book} onDelete={handleDeleteBook} currentUserId={user?._id} />
           ))}
         </div>
 
-        {/* Pagination */}
+        {/* Pagination - unchanged */}
         {totalPages > 1 && (
           <div className="mt-16 flex justify-center items-center space-x-8">
             <button
-              className="px-6 py-3 border border-gray-800 text-sm tracking-wide hover:border-white hover:text-white transition-colors duration-200 disabled:opacity-30 disabled:hover:border-gray-800 disabled:hover:text-gray-400"
+              className="px-6 py-3 border border-gray-800 text-sm tracking-wide hover:border-white hover:text-white transition-colors duration-200 disabled:opacity-30"
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={page === 1}
             >
               PREV
             </button>
-            
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-400 tracking-widest">
                 {String(page).padStart(2, '0')}
@@ -146,9 +156,8 @@ const BookListPage = () => {
                 {String(totalPages).padStart(2, '0')}
               </span>
             </div>
-
             <button
-              className="px-6 py-3 border border-gray-800 text-sm tracking-wide hover:border-white hover:text-white transition-colors duration-200 disabled:opacity-30 disabled:hover:border-gray-800 disabled:hover:text-gray-400"
+              className="px-6 py-3 border border-gray-800 text-sm tracking-wide hover:border-white hover:text-white transition-colors duration-200 disabled:opacity-30"
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={page === totalPages}
             >
@@ -160,7 +169,6 @@ const BookListPage = () => {
     </div>
   )
 }
-
 // ✅ Refactored BookCard component with conditional delete
 const BookCard = ({ book, onDelete, currentUserId }) => {
   const [avgRating, setAvgRating] = useState(null)
@@ -201,7 +209,7 @@ const BookCard = ({ book, onDelete, currentUserId }) => {
               <h2 className="text-xl font-light tracking-wide mb-3 group-hover:text-gray-300 transition-colors duration-200">
                 {book.title}
               </h2>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center space-x-4">
                   <span className="text-xs uppercase tracking-widest text-gray-500 w-16">AUTHOR</span>
@@ -218,11 +226,10 @@ const BookCard = ({ book, onDelete, currentUserId }) => {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <div
                           key={star}
-                          className={`w-2 h-2 border ${
-                            avgRating && star <= Math.round(avgRating)
+                          className={`w-2 h-2 border ${avgRating && star <= Math.round(avgRating)
                               ? 'bg-white border-white'
                               : 'border-gray-600'
-                          }`}
+                            }`}
                         ></div>
                       ))}
                     </div>
@@ -246,7 +253,7 @@ const BookCard = ({ book, onDelete, currentUserId }) => {
               </button>
             )}
           </div>
-          
+
           <div className="w-full h-px bg-gray-900 group-hover:bg-gray-700 transition-colors duration-200"></div>
         </div>
       </Link>
