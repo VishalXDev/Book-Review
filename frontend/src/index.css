@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+.my-custom-class {
+  font-weight: bold;
+}
+@tailwind utilities;
