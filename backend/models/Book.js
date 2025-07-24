@@ -26,16 +26,14 @@ const bookSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review',
+      },
+    ],
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  { timestamps: true }
 );
-
-// Virtual to calculate average rating (async virtuals require usage in code)
-bookSchema.virtual('averageRating').get(async function () {
-  const reviews = await mongoose.model('Review').find({ book: this._id });
-  if (reviews.length === 0) return 0;
-  const avg = reviews.reduce((acc, cur) => acc + cur.rating, 0) / reviews.length;
-  return Number(avg.toFixed(2));
-});
 
 module.exports = mongoose.model('Book', bookSchema);

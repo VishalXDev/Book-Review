@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const LoginPage = () => {
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ username: '', password: '' }) // 🔁 CHANGED from email to username
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -36,10 +36,10 @@ const LoginPage = () => {
       {error && <p className="text-red-600 mb-3">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
+          type="text"
+          name="username" // 🔁 CHANGED from email to username
+          placeholder="Username or Email"
+          value={form.username}
           onChange={handleChange}
           required
           className="w-full mb-3 border p-2"

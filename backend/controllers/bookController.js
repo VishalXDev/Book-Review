@@ -1,4 +1,5 @@
 const Book = require('../models/Book');
+const Review = require('../models/Review');
 
 // ➕ Add a new book
 exports.addBook = async (req, res) => {
@@ -26,8 +27,24 @@ exports.getBooks = async (req, res) => {
 
     const count = await Book.countDocuments(query);
 
+    // Calculate averageRating for each book
+    const booksWithRatings = await Promise.all(
+      books.map(async (book) => {
+        const reviews = await Review.find({ book: book._id });
+        const avgRating =
+          reviews.length === 0
+            ? 0
+            : reviews.reduce((acc, cur) => acc + cur.rating, 0) / reviews.length;
+
+        return {
+          ...book.toObject(),
+          averageRating: Number(avgRating.toFixed(2)),
+        };
+      })
+    );
+
     res.json({
-      books,
+      books: booksWithRatings,
       total: count,
       page: parseInt(page),
       totalPages: Math.ceil(count / parseInt(limit)),
@@ -42,7 +59,17 @@ exports.getBookById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: 'Book not found' });
-    res.json(book);
+
+    const reviews = await Review.find({ book: book._id });
+    const avgRating =
+      reviews.length === 0
+        ? 0
+        : reviews.reduce((acc, cur) => acc + cur.rating, 0) / reviews.length;
+
+    res.json({
+      ...book.toObject(),
+      averageRating: Number(avgRating.toFixed(2)),
+    });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching book', error: err.message });
   }
