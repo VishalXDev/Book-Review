@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: 6,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -39,14 +43,11 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Hide password field when converting to JSON
+// 🚫 Hide password when returning user object
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
   return obj;
 };
-
-// Optional: Add index to optimize queries
-userSchema.index({ username: 1 });
 
 module.exports = mongoose.model('User', userSchema);
