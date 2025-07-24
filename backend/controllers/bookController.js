@@ -27,7 +27,6 @@ exports.getBooks = async (req, res) => {
 
     const count = await Book.countDocuments(query);
 
-    // Calculate averageRating for each book
     const booksWithRatings = await Promise.all(
       books.map(async (book) => {
         const reviews = await Review.find({ book: book._id });
@@ -80,6 +79,10 @@ exports.deleteBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: 'Book not found' });
+
+    // ✅ Debug logs to compare creator and logged-in user
+    console.log('🟡 Book Created By:', book.createdBy.toString());
+    console.log('🔵 Logged-in User:', req.user._id.toString());
 
     if (book.createdBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this book' });

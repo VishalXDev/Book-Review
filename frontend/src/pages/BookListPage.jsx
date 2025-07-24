@@ -25,6 +25,7 @@ const BookListPage = () => {
   const debouncedAuthor = useDebounce(author)
 
   const API_BASE = process.env.REACT_APP_API_BASE_URL
+  const user = JSON.parse(localStorage.getItem('user'))
 
   const fetchBooks = async () => {
     setLoading(true)
@@ -46,6 +47,20 @@ const BookListPage = () => {
   useEffect(() => {
     fetchBooks()
   }, [debouncedGenre, debouncedAuthor, page])
+
+  // 👉 Delete handler: passed to BookCard
+  const handleDeleteBook = async (bookId) => {
+    try {
+      await axios.delete(`${API_BASE}/api/books/${bookId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      setBooks((prev) => prev.filter((b) => b._id !== bookId))
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to delete book')
+    }
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -76,7 +91,7 @@ const BookListPage = () => {
       {/* Book Cards */}
       {!loading && books.length === 0 && <p>No books found.</p>}
       {books.map((book) => (
-        <BookCard key={book._id} book={book} />
+        <BookCard key={book._id} book={book} onDelete={handleDeleteBook} currentUserId={user?._id} />
       ))}
 
       {/* Pagination */}
@@ -103,14 +118,15 @@ const BookListPage = () => {
   )
 }
 
-const BookCard = ({ book }) => {
+// ✅ Refactored BookCard component with conditional delete
+const BookCard = ({ book, onDelete, currentUserId }) => {
   const [avgRating, setAvgRating] = useState(null)
+  const [deleting, setDeleting] = useState(false)
   const API_BASE = process.env.REACT_APP_API_BASE_URL
 
   useEffect(() => {
     const fetchAvg = async () => {
       try {
-        // NOTE: backend needs averageRating endpoint; otherwise compute client-side or remove
         const res = await axios.get(`${API_BASE}/reviews/${book._id}`)
         const ratings = res.data.map((r) => r.rating)
         const avg = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null
@@ -120,15 +136,40 @@ const BookCard = ({ book }) => {
       }
     }
     fetchAvg()
-  }, [book._id, API_BASE])
+  }, [book._id])
+
+  const handleDeleteClick = async (e) => {
+    e.preventDefault()
+    if (!window.confirm(`Are you sure you want to delete "${book.title}"?`)) return
+    try {
+      setDeleting(true)
+      await onDelete(book._id)
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   return (
-    <Link to={`/books/${book._id}`} className="block mb-4 p-4 border rounded shadow hover:bg-gray-50">
-      <h2 className="text-xl font-semibold">{book.title}</h2>
-      <p>Author: {book.author}</p>
-      <p>Genre: {book.genre}</p>
-      <p>⭐ Average Rating: {avgRating !== null ? avgRating.toFixed(1) : 'N/A'}</p>
-    </Link>
+    <div className="relative block mb-4 p-4 border rounded shadow hover:bg-gray-50">
+      <Link to={`/books/${book._id}`}>
+        <h2 className="text-xl font-semibold">{book.title}</h2>
+        <p>Author: {book.author}</p>
+        <p>Genre: {book.genre}</p>
+        <p>⭐ Average Rating: {avgRating !== null ? avgRating.toFixed(1) : 'N/A'}</p>
+      </Link>
+
+      {/* 🔒 Show delete only if current user is creator */}
+      {book.user === currentUserId && (
+        <button
+          onClick={handleDeleteClick}
+          disabled={deleting}
+          className="absolute top-2 right-2 text-red-600 hover:text-red-800 text-sm"
+          title="Delete book"
+        >
+          {deleting ? 'Deleting...' : '🗑️'}
+        </button>
+      )}
+    </div>
   )
 }
 
