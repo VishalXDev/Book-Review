@@ -6,8 +6,7 @@ const {
   getReviewsByBook,
   deleteReview,
 } = require('../controllers/reviewController');
-
-const protect = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 
 // @route   POST /api/reviews/:bookId
 // @desc    Add a review to a book
