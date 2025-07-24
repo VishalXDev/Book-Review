@@ -1,70 +1,108 @@
-# Getting Started with Create React App
+📚 Book Review Platform – Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the React frontend for the Book Review Platform, featuring modern UI, user authentication, book browsing, rating & reviewing system, and filtering/sorting.
 
-## Available Scripts
+🌐 **Live Site**:  
+[https://book-review-six-self.vercel.app](https://book-review-six-self.vercel.app)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🛠️ Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React.js (Hooks & Functional Components)
+- Axios (for API requests)
+- React Router DOM
+- React Hot Toast (notifications)
+- Tailwind CSS (styling)
+- JWT-based auth with localStorage
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## 🚀 Getting Started (Local Setup)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. Clone the Repository
 
-### `npm run build`
+```bash
+git clone https://github.com/your-username/book-review-platform.git
+cd frontend
+2. Install Dependencies
+bash
+Copy
+Edit
+npm install
+3. Configure API Base URL
+Update the Axios instance (usually in src/lib/axios.js):
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+js
+Copy
+Edit
+const api = axios.create({
+  baseURL: 'https://book-review-2m9o.onrender.com/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+export default api;
+4. Run Development Server
+bash
+Copy
+Edit
+npm run dev
+App will be available at: http://localhost:3000
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+🔐 Auth Features
+✅ User registration
 
-### `npm run eject`
+✅ Login with JWT
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+✅ Auth-protected routes (Profile, Review)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+✅ Persistent login (localStorage)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+📚 Book Features
+✅ List all books
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+✅ View individual book details
 
-## Learn More
+✅ Submit reviews with rating
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+✅ Filter by genre
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+✅ Sort by rating and date
 
-### Code Splitting
+✅ Pagination support
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+✨ Styling
+Fully responsive design
 
-### Analyzing the Bundle Size
+Tailwind CSS used throughout
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Dark mode-ready layout
 
-### Making a Progressive Web App
+Toast notifications for user feedback
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+🔧 Environment Variables (Optional)
+If needed, you can add .env.local for frontend config:
 
-### Advanced Configuration
+env
+Copy
+Edit
+VITE_API_URL=https://book-review-2m9o.onrender.com/api
+Make sure the app reads it properly if you're using vite.config.js.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+🧪 Testing & Validation
+All core features manually tested
 
-### Deployment
+Frontend integrated with backend on Render
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+CORS configured to allow communication
 
-### `npm run build` fails to minify
+⚙️ Deployment
+Deployed on Vercel
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Live at:
+https://book-review-six-self.vercel.app
+
+Connected to backend hosted on Render
